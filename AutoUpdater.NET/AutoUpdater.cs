@@ -212,6 +212,15 @@ namespace AutoUpdaterDotNET
         /// </summary>
         public static event CheckForUpdateEventHandler CheckForUpdateEvent;
 
+        public delegate void OnDownloadFinishedEventHandler(bool Success);
+
+        public static event OnDownloadFinishedEventHandler DownloadFinishedEvent;
+
+        public delegate void OnProgressChangedEventHandler(string downloadSpeed, string size, int progress);
+        public static event OnProgressChangedEventHandler OnProgressChanged;
+
+        public static DownloadUpdateClass DownloaderClass;
+
         /// <summary>
         ///     A delegate type for hooking up parsing logic.
         /// </summary>
@@ -630,18 +639,63 @@ namespace AutoUpdaterDotNET
         /// </summary>
         public static bool DownloadUpdate(UpdateInfoEventArgs args)
         {
-            using (var downloadDialog = new DownloadUpdateDialog(args))
-            {
-                try
-                {
-                    return downloadDialog.ShowDialog().Equals(DialogResult.OK);
-                }
-                catch (TargetInvocationException)
-                {
-                }
-            }
+            //using (var downloadDialog = new DownloadUpdateDialog(args))
+            //{
+            //    try
+            //    {
+            //        return downloadDialog.ShowDialog().Equals(DialogResult.OK);
+            //    }
+            //    catch (TargetInvocationException)
+            //    {
+            //    }
+            //}
 
-            return false;
+            // Clear download folder
+            //string downloadDir = string.IsNullOrEmpty(DownloadPath) ? Path.GetTempPath() : DownloadPath;
+            //if (Directory.Exists(downloadDir))
+            //{
+            //    DirectoryInfo directoryInfo = new DirectoryInfo(downloadDir);
+            //    foreach (FileInfo file in directoryInfo.GetFiles())
+            //    {
+            //        file.Delete();
+            //    }
+            //    foreach (DirectoryInfo dir in directoryInfo.GetDirectories())
+            //    {
+            //        dir.Delete(true);
+            //    }
+            //}
+
+            DownloaderClass = new DownloadUpdateClass(args, false);
+            DownloaderClass.DownloadFinishedEvent += UpdaterClass_DownloadFinishedEvent;
+            DownloaderClass.OnProgressChanged += DownloaderClass_OnProgressChanged;
+
+            return true;
+        }
+
+        public static void SetupExternDownloader(UpdateInfoEventArgs args)
+        {
+            DownloaderClass = new DownloadUpdateClass(args, true);
+            //DownloaderClass.DownloadFinishedEvent += UpdaterClass_DownloadFinishedEvent;
+            DownloaderClass.OnProgressChanged += DownloaderClass_OnProgressChanged;
+        }
+
+        public static void OnExternDownloadFinished()
+        {
+            DownloaderClass.OnExternDownloadFinished();            
+        }
+
+        private static void DownloaderClass_OnProgressChanged(object sender)
+        {
+            var downloader = sender as DownloadUpdateClass;
+            if(downloader != null)
+                OnProgressChanged(downloader.SpeedInformation, downloader.Size, downloader.Progress);
+        }
+
+        private static void UpdaterClass_DownloadFinishedEvent(bool Success)
+        {
+            DownloadFinishedEvent(Success);
+            DownloaderClass = null;
+            //Application.Exit();
         }
 
         /// <summary>
@@ -663,7 +717,7 @@ namespace AutoUpdaterDotNET
             }
         }
 
-        internal static MyWebClient GetWebClient(Uri uri, IAuthentication basicAuthentication)
+        public static MyWebClient GetWebClient(Uri uri, IAuthentication basicAuthentication)
         {
             MyWebClient webClient = new MyWebClient
             {

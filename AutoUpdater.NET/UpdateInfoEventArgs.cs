@@ -35,7 +35,7 @@ namespace AutoUpdaterDotNET
         [XmlElement("url")]
         public string DownloadURL
         {
-            get => GetURL(AutoUpdater.BaseUri, _downloadURL);
+            get => _downloadURL;
             set => _downloadURL = value;
         }
 
@@ -45,7 +45,7 @@ namespace AutoUpdaterDotNET
         [XmlElement("changelog")]
         public string ChangelogURL
         {
-            get => GetURL(AutoUpdater.BaseUri, _changelogURL);
+            get => _changelogURL;
             set => _changelogURL = value;
         }
 
