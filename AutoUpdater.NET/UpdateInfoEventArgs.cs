@@ -60,6 +60,8 @@ namespace AutoUpdaterDotNET
         /// </summary>
         public Version InstalledVersion { get; set; }
 
+        public string InstalledVersionFull { get; set; }
+
         /// <summary>
         ///     Shows if the update is required or optional.
         /// </summary>

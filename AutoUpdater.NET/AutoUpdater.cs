@@ -75,6 +75,8 @@ namespace AutoUpdaterDotNET
         /// </summary>
         public static Version InstalledVersion;
 
+        public static string InstalledVersionFull;
+
         /// <summary>
         ///     Set it to folder path where you want to download the update file. If not provided then it defaults to Temp folder.
         /// </summary>
@@ -392,6 +394,12 @@ namespace AutoUpdaterDotNET
             }
 
             args.InstalledVersion = InstalledVersion != null ? InstalledVersion : mainAssembly.GetName().Version;
+            //args.InstalledVersionFull = InstalledVersionFull != null && InstalledVersionFull.Length > 0 ? InstalledVersionFull : FileVersionInfo.GetVersionInfo(mainAssembly.Location).ProductVersion;
+            //if(args.InstalledVersionFull.IndexOf('+') != -1)
+            //{
+            //    args.InstalledVersionFull = args.InstalledVersionFull.Substring(0, args.InstalledVersionFull.IndexOf('+'));
+            //}
+
             args.IsUpdateAvailable = new Version(args.CurrentVersion) > args.InstalledVersion;
 
             if (!Mandatory)
