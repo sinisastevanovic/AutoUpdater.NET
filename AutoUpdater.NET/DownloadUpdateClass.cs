@@ -159,9 +159,9 @@ namespace AutoUpdaterDotNET
                 var extension = Path.GetExtension(tempPath);
                 if (extension.Equals(".zip", StringComparison.OrdinalIgnoreCase) || extension.Equals(".pwr", StringComparison.OrdinalIgnoreCase))
                 {
-                    string installerPath = Path.Combine(Path.GetDirectoryName(tempPath) ?? throw new InvalidOperationException(), "ZipExtractor.exe");
+                    string installerPath = Path.Combine(Path.GetDirectoryName(tempPath) ?? throw new InvalidOperationException(), "VireedPatcher.exe");
 
-                    File.WriteAllBytes(installerPath, Resources.ZipExtractor);
+                    File.WriteAllBytes(installerPath, Resources.VireedPatcher);
 
                     string executablePath = Process.GetCurrentProcess().MainModule?.FileName;
                     string extractionPath = Path.GetDirectoryName(executablePath);

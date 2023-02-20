@@ -210,13 +210,15 @@ namespace AutoUpdaterDotNET.Properties {
                 return ResourceManager.GetString("UpdateUnavailableMessage", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] ZipExtractor {
-            get {
-                object obj = ResourceManager.GetObject("ZipExtractor", resourceCulture);
+        internal static byte[] VireedPatcher
+        {
+            get
+            {
+                object obj = ResourceManager.GetObject("VireedPatcher", resourceCulture);
                 return ((byte[])(obj));
             }
         }
