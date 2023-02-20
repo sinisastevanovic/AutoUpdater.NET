@@ -20,6 +20,7 @@
         <NeutralLanguage>en</NeutralLanguage>
         <LangVersion>default</LangVersion>
         <IsPackable>false</IsPackable>
+        <PlatformTarget>AnyCPU</PlatformTarget>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(TargetFramework)' != 'net45' ">
         <RuntimeIdentifier>win-x86</RuntimeIdentifier>

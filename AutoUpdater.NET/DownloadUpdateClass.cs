@@ -157,7 +157,7 @@ namespace AutoUpdaterDotNET
                 };
 
                 var extension = Path.GetExtension(tempPath);
-                if (extension.Equals(".zip", StringComparison.OrdinalIgnoreCase))
+                if (extension.Equals(".zip", StringComparison.OrdinalIgnoreCase) || extension.Equals(".pwr", StringComparison.OrdinalIgnoreCase))
                 {
                     string installerPath = Path.Combine(Path.GetDirectoryName(tempPath) ?? throw new InvalidOperationException(), "ZipExtractor.exe");
 
@@ -172,12 +172,37 @@ namespace AutoUpdaterDotNET
                         extractionPath = AutoUpdater.InstallationPath;
                     }
 
-                    StringBuilder arguments =
-                        new StringBuilder($"\"{tempPath}\" \"{extractionPath}\" \"{executablePath}\"");
+                    StringBuilder arguments;
+                    if (extension.Equals(".pwr", StringComparison.OrdinalIgnoreCase))
+                    {                     
+                        arguments = new StringBuilder();
+                        string downloadDir = string.IsNullOrEmpty(AutoUpdater.DownloadPath) ? Path.GetTempPath() : AutoUpdater.DownloadPath;
+                        if (_args.PreviousUpdates.Count > 0)
+                        {
+                            arguments.Append($"\"");
+                            foreach(var update in _args.PreviousUpdates)
+                            {
+                                arguments.Append($"{Path.Combine(downloadDir, update.FileName.Substring(update.FileName.LastIndexOf('/') + 1))},");
+                            }
+                            arguments.Append($"{tempPath}\"");
+                        }
+                        else
+                        {
+                            arguments.Append($"\"{tempPath}\"");
+                        }
 
-                    if (AutoUpdater.ClearAppDirectory)
+                        arguments.Append($" \"{extractionPath}\"");
+                        arguments.Append($" \"{executablePath}\"");
+                        arguments.Append(" -p");
+                    }
+                    else
                     {
-                        arguments.Append(" -c");
+                        arguments = new StringBuilder($"\"{tempPath}\" \"{extractionPath}\" \"{executablePath}\"");
+                        
+                        if (AutoUpdater.ClearAppDirectory)
+                        {
+                            arguments.Append(" -c");
+                        }
                     }
 
                     string[] args = Environment.GetCommandLineArgs();
@@ -216,25 +241,22 @@ namespace AutoUpdaterDotNET
                 {
                     processStartInfo.Verb = "runas";
                 }
-
-                if(!extension.Equals(".pwr", StringComparison.OrdinalIgnoreCase))
+                
+                try
                 {
-                    try
+                    Process.Start(processStartInfo);
+                }
+                catch (Win32Exception exception)
+                {
+                    if (exception.NativeErrorCode == 1223)
                     {
-                        Process.Start(processStartInfo);
+                        _webClient = null;
                     }
-                    catch (Win32Exception exception)
+                    else
                     {
-                        if (exception.NativeErrorCode == 1223)
-                        {
-                            _webClient = null;
-                        }
-                        else
-                        {
-                            throw;
-                        }
+                        throw;
                     }
-                }              
+                }
             }
             catch (Exception e)
             {
